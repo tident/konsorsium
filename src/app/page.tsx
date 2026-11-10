@@ -1,7 +1,7 @@
 ﻿// src/app/page.tsx
 "use client"; // Wajib ditambahkan karena kita menggunakan state untuk slider
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import PublicNavbar from "./components/PublicNavbar";
 import PublicFooter from "./components/PublicFooter"
@@ -21,6 +21,16 @@ export default function LandingPage() {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+
+    // Logika Auto-Play Slider (5 Detik)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    }, 3000); // 3000 ms = 3 detik
+
+    // Bersihkan interval jika komponen di-unmount
+    return () => clearInterval(interval);
+  }, [slides.length, currentSlide]); // Dependensi currentSlide agar timer reset saat user klik manual  
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
@@ -111,18 +121,59 @@ export default function LandingPage() {
         </div>
 
         {/* Statistik Section */}
+        {/* Statistik Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          {[
-            { val: "82", label: "Penerima Tahun 2025" },
-            { val: "Rp45,41 M", label: "Total Pendanaan 2025" },
-            { val: "102", label: "Penerima Tahun 2026" },
-            { val: "Rp62,49 M", label: "Total Pendanaan 2025" },
-          ].map((stat, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <h3 className="text-2xl font-bold text-indigo-900 mb-1">{stat.val}</h3>
-              <p className="text-sm text-slate-500">{stat.label}</p>
+          
+          {/* Kartu 2025 - Penerima */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px]">
+            <div className="inline-block bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4">
+              TA 2025
             </div>
-          ))}
+            <div>
+              <h3 className="text-4xl font-black text-indigo-950 mb-1">82</h3>
+              <p className="text-sm text-slate-500 font-medium">Penerima Pendanaan</p>
+            </div>
+          </div>
+
+          {/* Kartu 2025 - Anggaran */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px]">
+            <div className="inline-block bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4">
+              TA 2025
+            </div>
+            <div>
+              <h3 className="text-4xl font-black text-indigo-950 mb-1">Rp45,41 M</h3>
+              <p className="text-sm text-slate-500 font-medium">Total Anggaran</p>
+            </div>
+          </div>
+
+          {/* Kartu 2026 - Penerima */}
+          <div className="bg-indigo-900 p-6 rounded-2xl shadow-md flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+             {/* Dekorasi Background */}
+            <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
+            
+            <div className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4 relative z-10">
+              TA 2026
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-4xl font-black text-white mb-1">102</h3>
+              <p className="text-sm text-indigo-200 font-medium">Penerima Pendanaan</p>
+            </div>
+          </div>
+
+          {/* Kartu 2026 - Anggaran */}
+          <div className="bg-indigo-900 p-6 rounded-2xl shadow-md flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+             {/* Dekorasi Background */}
+             <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
+            
+            <div className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4 relative z-10">
+              TA 2026
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-4xl font-black text-white mb-1">Rp62,49 M</h3>
+              <p className="text-sm text-indigo-200 font-medium">Total Anggaran</p>
+            </div>
+          </div>
+
         </div>
 
         {/* About Section */}

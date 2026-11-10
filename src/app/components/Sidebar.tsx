@@ -24,6 +24,12 @@ const IconUsers = () => (
   </svg>
 );
 
+const IconWhatsOn = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+  </svg>
+);
+
 const IconDataCenter = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4zm0 5c0 2.21 3.582 4 8 4s8-1.79 8-4" />
@@ -51,6 +57,24 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     }
   }, []);
 
+  // Otomatis buka accordion jika halaman aktif adalah submenu data center
+  useEffect(() => {
+    if (pathname.includes("/dashboard/rikub")) {
+      setIsDataCenterOpen(true);
+    }
+  }, [pathname]);
+
+  const handleDataCenterClick = () => {
+    if (!isOpen) {
+      // Jika sidebar sedang ter-minimize, otomatis buka sidebar dan tampilkan submenu
+      setIsOpen(true);
+      setIsDataCenterOpen(true);
+    } else {
+      // Jika sidebar sudah terbuka, toggle accordion seperti biasa
+      setIsDataCenterOpen(!isDataCenterOpen);
+    }
+  };
+
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <IconDashboard /> },
     { name: "Profil Saya", path: "/dashboard/profile", icon: <IconProfile /> },
@@ -58,6 +82,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
 
   if (role === "admin") {
     menuItems.push({ name: "Manajemen Akun", path: "/dashboard/accounts", icon: <IconUsers /> });
+    menuItems.push({ name: "What's On", path: "/dashboard/whats-on", icon: <IconWhatsOn /> });
   }
 
   return (
@@ -81,15 +106,14 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
         <div className={`h-16 flex items-center border-b border-slate-100 transition-all duration-300 ${isOpen ? "px-6" : "justify-center"}`}>
           <span className="text-xl font-extrabold text-blue-600 tracking-wider flex items-center gap-2">
             <div className="w-8 h-8 shrink-0 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-lg">K</div>
-            {/* Sembunyikan teks MyApp saat tertutup */}
             <span className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${isOpen ? "opacity-100 w-auto" : "opacity-0 w-0 hidden"}`}>
               Konsorsium
             </span>
           </span>
         </div>
         
-                {/* Area Menu */}
-        <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto overflow-x-hidden">
+        {/* Area Menu */}
+        <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
           <p className={`px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 hidden"}`}>
             Menu Utama
           </p>
@@ -106,7 +130,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
                   ${isOpen ? "px-3 py-2.5 gap-3" : "justify-center p-3"}
                   ${isActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"}
                 `}
-                title={item.name}
+                title={!isOpen ? item.name : undefined}
               >
                 <div className={`shrink-0 ${isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"}`}>
                   {item.icon}
@@ -118,15 +142,15 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
             );
           })}
 
-          {/* --- MENU DATA CENTER (Dropdown) --- */}
-          <div className="w-full">
+          {/* --- MENU DATA CENTER (Dropdown / Popup Mode) --- */}
+          <div className="w-full relative group">
             <button
-              onClick={() => setIsDataCenterOpen(!isDataCenterOpen)}
+              onClick={handleDataCenterClick}
               className={`w-full flex items-center rounded-xl transition-all duration-200 group cursor-pointer
                 ${isOpen ? "px-3 py-2.5 justify-between" : "justify-center p-3"}
-                ${pathname.includes("/dashboard/rikub") ? "text-blue-700 font-semibold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"}
+                ${pathname.includes("/dashboard/rikub") ? "bg-blue-50 text-blue-700 font-semibold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"}
               `}
-              title="Data Center"
+              title={!isOpen ? "Data Center" : undefined}
             >
               {/* Ikon & Teks */}
               <div className={`flex items-center ${isOpen ? "gap-3" : "justify-center w-full"}`}>
@@ -138,14 +162,14 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
                 </span>
               </div>
               
-              {/* Ikon Panah */}
+              {/* Ikon Panah (Hanya tampil jika sidebar terbuka) */}
               <div className={`transition-transform duration-300 ${isDataCenterOpen ? "rotate-180" : ""} ${isOpen ? "block" : "hidden"}`}>
                 <IconChevronDown />
               </div>
             </button>
             
-            {/* Submenu */}
-            {isDataCenterOpen && isOpen && (
+            {/* 1. Submenu ketika Sidebar TERBUKA (Accordion mode) */}
+            {isOpen && isDataCenterOpen && (
               <div className="mt-1 ml-4 pl-4 border-l-2 border-slate-100 space-y-1">
                 <Link
                   href="/dashboard/rikub"
@@ -158,14 +182,31 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
                 </Link>
               </div>
             )}
+
+            {/* 2. Submenu Floating Popover ketika Sidebar TERSEMBUNYI / MINIMIZE (Hover/Click mode) */}
+            {!isOpen && (
+              <div className="absolute left-full top-0 ml-2 hidden group-hover:flex flex-col bg-white border border-slate-200 rounded-xl shadow-lg p-2 min-w-[140px] z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-1.5 text-xs font-bold text-slate-400 border-b border-slate-100 mb-1">
+                  Data Center
+                </div>
+                <Link
+                  href="/dashboard/rikub"
+                  className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors ${
+                    pathname === "/dashboard/rikub" ? "text-blue-700 font-semibold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium"
+                  }`}
+                >
+                  RIKUB
+                </Link>
+              </div>
+            )}
           </div>
         </nav>
         
         {/* Area Footer */}
         <div className={`p-4 border-t border-slate-100 transition-all duration-300 ${isOpen ? "" : "flex justify-center"}`}>
           <div className={`bg-slate-50 rounded-xl text-center overflow-hidden ${isOpen ? "p-4 w-full" : "p-2 w-10 h-10 flex items-center justify-center"}`}>
-             <p className={`text-xs text-slate-500 whitespace-nowrap ${isOpen ? "block" : "hidden"}`}>Versi 1.0.0</p>
-             {!isOpen && <span className="text-slate-400 font-bold text-xs">v1</span>}
+             <p className={`text-xs text-slate-500 whitespace-nowrap ${isOpen ? "block" : "hidden"}`}>Versi 4.0.0</p>
+             {!isOpen && <span className="text-slate-400 font-bold text-xs">v4</span>}
           </div>
         </div>
       </aside>

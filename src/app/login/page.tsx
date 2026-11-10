@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { callApi } from "../components/api";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-white">
+            {/* TOMBOL KEMBALI KE LANDING PAGE */}
             {/* BAGIAN KIRI: Desain/Gambar (Split-Screen) */}
       <div 
         className="hidden lg:flex lg:w-1/2 text-white flex-col justify-between p-12 relative overflow-hidden bg-cover bg-center"
@@ -62,6 +64,19 @@ export default function LoginPage() {
       {/* BAGIAN KANAN: Form Login */}
       <div className="flex-1 flex flex-col justify-center p-8 sm:p-12 lg:px-20 xl:px-24">
         <div className="w-full max-w-lg mx-auto">
+          
+          {/* TOMBOL KEMBALI (Rata Kanan) */}
+          <div className="flex justify-end mb-4">
+            <Link 
+              href="/"
+              className="group flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Kembali ke Beranda
+            </Link>
+          </div>
           
           {/* --- AREA LOGO (Rata Kiri) --- */}
            <div className="flex flex-wrap gap-2 mb-4">
