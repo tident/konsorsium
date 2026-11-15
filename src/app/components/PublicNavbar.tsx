@@ -33,6 +33,9 @@ export default function PublicNavbar() {
           <Link href="/kirrana" className={`px-4 py-2 rounded-full transition-colors ${isActive("/kirrana") ? "text-indigo-900 bg-indigo-50 font-semibold" : "hover:text-indigo-900"}`}>
             KIRRANA
           </Link>
+          <Link href="/pair" className={`px-4 py-2 rounded-full transition-colors ${isActive("/pair") ? "text-indigo-900 bg-indigo-50 font-semibold" : "hover:text-indigo-900"}`}>
+            PAIR
+          </Link>
         </nav>
 
         {/* Tombol Login & Hamburger (Kanan) */}
@@ -74,6 +77,9 @@ export default function PublicNavbar() {
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block w-full text-center bg-indigo-900 hover:bg-indigo-800 text-white px-6 py-3 rounded-xl font-medium transition-colors cursor-pointer">
                 Login
               </Link>
+              <Link href="/pair" onClick={() => setIsMobileMenuOpen(false)} className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive("/pair") ? "text-indigo-900 bg-indigo-50 font-semibold" : "text-slate-600 hover:bg-slate-50"}`}>
+              PAIR
+            </Link>
             </div>
           </nav>
         </div>

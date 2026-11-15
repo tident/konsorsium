@@ -16,7 +16,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-white tracking-wide">Konsorsium</span>
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Platform terintegrasi untuk mengelola ekosistem penelitian, pendanaan, dan hilirisasi inovasi dari perguruan tinggi, industri, dan pemerintah.
+              Platform internal terintegrasi untuk mengelola data program yang dikelola oleh Tim Konsorsium, DPPM, Ditjen Risbang Kemditisaintek.
             </p>
             {/* Logo Mitra (Opsional) */}
             <div className="flex gap-3 pt-2">
