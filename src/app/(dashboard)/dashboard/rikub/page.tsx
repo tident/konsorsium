@@ -304,18 +304,19 @@ export default function RikubDashboardPage() {
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Status Pelaksanaan</th>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Lama Konsorsium</th>
                 <th className="px-4 py-3 font-medium w-[20%] min-w-[150px]">Institusi</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Provinsi Instansi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
                 {loadingTable ? (
                 <tr>
-                  <td colSpan={9}>
+                  <td colSpan={10}>
                     <TableSpinner />
                   </td>
                 </tr>
               ) : currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={10} className="px-4 py-8 text-center text-slate-400">
                     Tidak ada data yang cocok dengan filter/pencarian Anda.
                   </td>
                 </tr>
@@ -383,6 +384,10 @@ export default function RikubDashboardPage() {
 
                       <td className="px-4 py-3 text-slate-600 break-words">
                         {row.nama_institusi_ketua_konsorsium}
+                      </td>
+
+                      <td className="px-4 py-3 text-slate-600 break-words">
+                        {row.provinsi_instansi_ketua_konsorsium}
                       </td>
                     </tr>
                   );
