@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import PublicNavbar from "../components/PublicNavbar";
 import { callApi } from "../components/api";
-import PublicFooter from "../components/PublicFooter"
+import PublicFooter from "../components/PublicFooter";
 
 type RikubData = {
   proposal_kegiatan_id: string;
@@ -19,7 +19,7 @@ type RikubData = {
   [key: string]: any;
 };
 
-// Koordinat Presisi dengan Offset Jitter untuk Mencegah Cluster Bertumpuk
+// Koordinat Presisi Provinsi
 const PROVINSI_COORDINATES: Record<string, { lat: number; lng: number }> = {
   "ACEH": { lat: 4.695135, lng: 96.749399 },
   "SUMATERA UTARA": { lat: 2.1153547, lng: 99.5450974 },
@@ -31,14 +31,14 @@ const PROVINSI_COORDINATES: Record<string, { lat: number; lng: number }> = {
   "LAMPUNG": { lat: -4.5585849, lng: 105.4068079 },
   "KEPULAUAN BANGKA BELITUNG": { lat: -2.7410513, lng: 106.4405872 },
   "KEPULAUAN RIAU": { lat: 3.9456514, lng: 108.1428669 },
-  "BANTEN": { lat: -6.4058172, lng: 105.8040179 },
-  "DKI JAKARTA": { lat: -6.0087634, lng: 106.845599 },
-  "JAKARTA": { lat: -6.0087634, lng: 106.845599 },
+  "BANTEN": { lat: -6.1158, lng: 106.1743 },
+  "DKI JAKARTA": { lat: -6.175392, lng: 106.827153 },
+  "JAKARTA": { lat: -6.175392, lng: 106.827153 },
   "JAWA BARAT": { lat: -6.9174639, lng: 107.8591228 },
   "JAWA TENGAH": { lat: -7.150975, lng: 110.1402594 },
-  "DI YOGYAKARTA": { lat: -8.0955798, lng: 110.3694896 },
-  "D.I. YOGYAKARTA": { lat: -8.0955798, lng: 110.3694896 },
-  "YOGYAKARTA": { lat: -8.0955798, lng: 110.3694896 },
+  "DI YOGYAKARTA": { lat: -7.795580, lng: 110.369490 },
+  "D.I. YOGYAKARTA": { lat: -7.795580, lng: 110.369490 },
+  "YOGYAKARTA": { lat: -7.795580, lng: 110.369490 },
   "JAWA TIMUR": { lat: -7.5360639, lng: 112.4384017 },
   "BALI": { lat: -8.4095178, lng: 115.188916 },
   "NUSA TENGGARA BARAT": { lat: -8.6529334, lng: 117.3616476 },
@@ -58,10 +58,64 @@ const PROVINSI_COORDINATES: Record<string, { lat: number; lng: number }> = {
   "MALUKU UTARA": { lat: 1.5709993, lng: 127.8087693 },
   "PAPUA BARAT": { lat: -1.3361154, lng: 133.1747162 },
   "PAPUA": { lat: -4.269928, lng: 138.0803529 },
-  "PAPUA SELATAN": { lat: -6.900000, lng: 139.500000 },
-  "PAPUA TENGAH": { lat: -3.700000, lng: 136.500000 },
-  "PAPUA PEGUNUNGAN": { lat: -4.100000, lng: 139.000000 },
-  "PAPUA BARAT DAYA": { lat: -1.150000, lng: 131.300000 }
+  "PAPUA SELATAN": { lat: -8.490123, lng: 140.403986 },
+  "PAPUA TENGAH": { lat: -3.344443, lng: 135.511394 },
+  "PAPUA PEGUNUNGAN": { lat: -4.084123, lng: 138.908234 },
+  "PAPUA BARAT DAYA": { lat: -0.877654, lng: 131.254321 }
+};
+
+// Koordinat Spesifik Kampus / Institusi Utama (Akurat per Perguruan Tinggi)
+const CAMPUS_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  "UNIVERSITAS AHMAD DAHLAN": { lat: -7.8382, lng: 110.3795 },
+  "INSTITUT PERTANIAN BOGOR": { lat: -6.5568, lng: 106.7277 },
+  "UNIVERSITAS DIPONEGORO": { lat: -7.0565, lng: 110.4378 },
+  "UNIVERSITAS INDONESIA": { lat: -6.3622, lng: 106.8235 },
+  "UNIVERSITAS ANDALAS": { lat: -0.9151, lng: 100.4651 },
+  "UNIVERSITAS GADJAH MADA": { lat: -7.7714, lng: 110.3777 },
+  "UNIVERSITAS BRAWIJAYA": { lat: -7.9525, lng: 112.6149 },
+  "UNIVERSITAS PEMBANGUNAN NASIONAL VETERAN JAWA TIMUR": { lat: -7.3325, lng: 112.7915 },
+  "UNIVERSITAS JEMBER": { lat: -8.1633, lng: 113.7171 },
+  "UNIVERSITAS RIAU": { lat: 0.4815, lng: 101.3855 },
+  "UNIVERSITAS LAMBUNG MANGKURAT": { lat: -3.4479, lng: 114.8324 },
+  "INSTITUT TEKNOLOGI BANDUNG": { lat: -6.8915, lng: 107.6107 },
+  "UNIVERSITAS NEGERI PADANG": { lat: -0.8972, lng: 100.3546 },
+  "POLITEKNIK NEGERI SEMARANG": { lat: -7.0562, lng: 110.4412 },
+  "INSTITUT TEKNOLOGI SEPULUH NOPEMBER": { lat: -7.2825, lng: 112.7949 },
+  "UNIVERSITAS SULTAN AGENG TIRTAYASA": { lat: -6.1152, lng: 106.1856 },
+  "UNIVERSITAS PADJADJARAN": { lat: -6.9269, lng: 107.7766 },
+  "UNIVERSITAS JENDERAL ACHMAD YANI": { lat: -6.8732, lng: 107.5415 },
+  "UNIVERSITAS KATOLIK SOEGIJAPRANATA": { lat: -7.0125, lng: 110.4035 },
+  "UNIVERSITAS NEGERI MEDAN": { lat: 3.6025, lng: 98.7123 },
+  "POLITEKNIK PERTANIAN NEGERI SAMARINDA": { lat: -0.5021, lng: 117.1534 },
+  "UNIVERSITAS LAMPUNG": { lat: -5.3585, lng: 105.2442 },
+  "POLITEKNIK ELEKTRONIKA NEGERI SURABAYA": { lat: -7.2762, lng: 112.7935 },
+  "UNIVERSITAS BHAKTI KENCANA": { lat: -6.9452, lng: 107.6521 },
+  "UNIVERSITAS SUMATERA UTARA": { lat: 3.5601, lng: 98.6558 },
+  "POLITEKNIK PERTANIAN NEGERI PANGKAJENE KEPULAUAN": { lat: -4.8325, lng: 119.5312 },
+  "UNIVERSITAS NEGERI JAKARTA": { lat: -6.1931, lng: 106.8845 },
+  "UNIVERSITAS TANJUNGPURA": { lat: -0.0543, lng: 109.3478 },
+  "UNIVERSITAS NGGUSUWARU": { lat: -8.4682, lng: 118.7265 },
+  "UNIVERSITAS NEGERI SEMARANG": { lat: -7.0451, lng: 110.3925 },
+  "UNIVERSITAS PENDIDIKAN MANDALIKA": { lat: -8.5835, lng: 116.1154 },
+  "UNIVERSITAS SAHID": { lat: -6.2412, lng: 106.8485 },
+  "UNIVERSITAS NEGERI YOGYAKARTA": { lat: -7.7751, lng: 110.3871 },
+  "UNIVERSITAS AMIKOM YOGYAKARTA": { lat: -7.7592, lng: 110.4095 },
+  "UNIVERSITAS JENDERAL SOEDIRMAN": { lat: -7.4242, lng: 109.2435 },
+  "UNIVERSITAS MAHASARASWATI DENPASAR": { lat: -8.6651, lng: 115.2215 },
+  "UNIVERSITAS SRIWIJAYA": { lat: -3.2185, lng: 104.6521 },
+  "UNIVERSITAS NEGERI MAKASSAR": { lat: -5.1654, lng: 119.4182 },
+  "UNIVERSITAS KATOLIK INDONESIA ATMA JAYA": { lat: -6.2205, lng: 106.8182 },
+  "UNIVERSITAS KRISTEN MARANATHA": { lat: -6.8875, lng: 107.5765 },
+  "UNIVERSITAS GUNADARMA": { lat: -6.3551, lng: 106.8324 },
+  "UNIVERSITAS TELKOM": { lat: -6.9741, lng: 107.6303 },
+  "UNIVERSITAS MUHAMMADIYAH MAGELANG": { lat: -7.5723, lng: 110.2185 },
+  "UNIVERSITAS MUHAMMADIYAH SURAKARTA": { lat: -7.5562, lng: 110.7781 },
+  "UNIVERSITAS NEGERI MALANG": { lat: -7.9621, lng: 112.6181 },
+  "UNIVERSITAS AIRLANGGA": { lat: -7.2684, lng: 112.7588 },
+  "UNIVERSITAS HANG TUAH": { lat: -7.2915, lng: 112.7842 },
+  "UNIVERSITAS NUSA CENDANA": { lat: -10.1785, lng: 123.6321 },
+  "UNIVERSITAS HASANUDDIN": { lat: -5.1339, lng: 119.4932 },
+  "UNIVERSITAS SAM RATULANGI": { lat: 1.4582, lng: 124.8451 }
 };
 
 const normalizeProvName = (str: string) => {
@@ -72,7 +126,6 @@ const normalizeProvName = (str: string) => {
 
 
 export default function RikubPage() {
-  // --- STATE DASHBOARD DATA ---
   const [data, setData] = useState<RikubData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,7 +135,7 @@ export default function RikubPage() {
   const [filterTipe, setFilterTipe] = useState("Semua");
   const [filterProvinsi, setFilterProvinsi] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
-
+  
   // State Tab & Mode Chart
   const [activeTab, setActiveTab] = useState("ringkasan");
   const [chartFokusMode, setChartFokusMode] = useState<"dana" | "judul">("dana");
@@ -90,9 +143,10 @@ export default function RikubPage() {
   const [mapMetric, setMapMetric] = useState<"judul" | "dana">("judul");
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
-  // Ref untuk Menyimpan Instance Peta dan Layer Group Marker
+  // Ref untuk Peta & Zoom Level Tracking
   const mapInstanceRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
+  const currentZoomRef = useRef<number>(5);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +157,6 @@ export default function RikubPage() {
     fetchData();
   }, []);
 
-  // --- LOGIKA FILTER & STATISTIK ---
   const uniqueTahun = useMemo(() => {
     const years = data.map(item => String(item.tahun_pendanaan || "").trim()).filter(Boolean);
     return Array.from(new Set(years)).sort().reverse();
@@ -123,6 +176,7 @@ export default function RikubPage() {
     const items = data.map(item => String(item.provinsi_instansi_ketua_konsorsium || "").trim()).filter(Boolean);
     return Array.from(new Set(items)).sort();
   }, [data]);
+
 
   const filteredData = useMemo(() => {
     return data.filter(row => {
@@ -146,13 +200,16 @@ export default function RikubPage() {
     });
   }, [data, filterTahun, filterBidang, filterTipe, filterProvinsi, searchQuery]);
 
-  // Hitung Statistik
+  const filteredUniqueBidangCount = useMemo(() => {
+  const items = filteredData.map(item => String(item.bidang_fokus || "").trim()).filter(Boolean);
+  return new Set(items).size;
+  }, [filteredData]);
+
   const totalAnggaran = filteredData.reduce((sum, row) => sum + (Number(row.pendanaan) || 0), 0);
   const totalJudul = filteredData.length;
   const uniqueInstitusi = new Set(filteredData.map(row => row.nama_institusi_ketua_konsorsium).filter(Boolean)).size;
   const rataRata = totalJudul > 0 ? totalAnggaran / totalJudul : 0;
 
-  // --- LOGIKA CHART & TOP 10 ---
   const fokusRisetMap: Record<string, { dana: number; judul: number }> = {};
   filteredData.forEach(row => {
     const bidang = row.bidang_fokus || "Lainnya";
@@ -199,7 +256,7 @@ export default function RikubPage() {
 
   const maxProvinsiValue = Math.max(...topProvinsi.map(item => chartProvinsiMode === "dana" ? item[1].dana : item[1].judul), 1);
 
-  // --- LOGIKA PETA CLUSTER / BUBBLE PER PROVINSI ---
+  // --- LOGIKA KLASTER PROVINSI ---
   const petaClusterData = useMemo(() => {
     const map: Record<string, { rawName: string; dana: number; judul: number; institusi: Set<string>; lat: number; lng: number }> = {};
 
@@ -225,9 +282,48 @@ export default function RikubPage() {
     return Object.values(map);
   }, [filteredData]);
 
+// --- LOGIKA DETAIL INSTITUSI DENGAN KOORDINAT SPESIFIK KAMPUS ---
+const petaInstitusiData = useMemo(() => {
+  const map: Record<string, { namaInstitusi: string; provinsi: string; dana: number; judul: number; lat: number; lng: number; listJudul: string[] }> = {};
+
+  filteredData.forEach(row => {
+    const rawProv = String(row.provinsi_instansi_ketua_konsorsium || "").trim();
+    const normKey = normalizeProvName(rawProv);
+    const provCoords = PROVINSI_COORDINATES[normKey] || { lat: -2.5489, lng: 118.0149 };
+    const namaInst = String(row.nama_institusi_ketua_konsorsium || "Institusi Lainnya").trim();
+    const upperInstName = namaInst.toUpperCase();
+
+    // Ambil koordinat spesifik kampus jika ada, jika tidak gunakan koordinat provinsi + jitter
+    const exactCoords = CAMPUS_COORDINATES[upperInstName];
+    const lat = exactCoords ? exactCoords.lat : provCoords.lat + (Math.random() - 0.5) * 0.08;
+    const lng = exactCoords ? exactCoords.lng : provCoords.lng + (Math.random() - 0.5) * 0.08;
+
+    const instKey = `${normKey}_${namaInst}`;
+    if (!map[instKey]) {
+      map[instKey] = {
+        namaInstitusi: namaInst,
+        provinsi: rawProv,
+        dana: 0,
+        judul: 0,
+        lat: lat,
+        lng: lng,
+        listJudul: []
+      };
+    }
+
+    map[instKey].dana += (Number(row.pendanaan) || 0);
+    map[instKey].judul += 1;
+    if (row.judul_proposal) {
+      map[instKey].listJudul.push(row.judul_proposal);
+    }
+  });
+
+  return Object.values(map);
+}, [filteredData]);
+
   const top10Riset = [...filteredData].sort((a, b) => (Number(b.pendanaan) || 0) - (Number(a.pendanaan) || 0)).slice(0, 10);
 
-  // Dynamic Leaflet Loader
+  // Dynamic Leaflet Loader & Zoom Listener
   useEffect(() => {
     if (activeTab === "peta" && typeof window !== "undefined") {
       const linkId = "leaflet-css";
@@ -263,11 +359,36 @@ export default function RikubPage() {
     };
   }, [activeTab]);
 
+  // Otomatis pusatkan dan zoom peta ke institusi yang dicari
+  useEffect(() => {
+    if (!mapInstanceRef.current || !searchQuery.trim()) return;
+
+    const q = searchQuery.toLowerCase().trim();
+    
+    // Cari data institusi yang cocok dengan kata kunci pencarian
+    const matchedInst = petaInstitusiData.find(item => 
+      item.namaInstitusi.toLowerCase().includes(q) ||
+      item.provinsi.toLowerCase().includes(q)
+    );
+
+    if (matchedInst) {
+      // Geser peta ke koordinat institusi dengan zoom level 8 (jelas terlihat tingkat kampus)
+      mapInstanceRef.current.setView([matchedInst.lat, matchedInst.lng], 8, {
+        animate: true,
+        duration: 1
+      });
+      
+      // Update ref zoom agar langsung merender marker level institusi (>= 6)
+      currentZoomRef.current = 8;
+      updateMarkers();
+    }
+  }, [searchQuery, petaInstitusiData]);
+
   useEffect(() => {
     if (activeTab === "peta" && mapInstanceRef.current) {
       updateMarkers();
     }
-  }, [petaClusterData, mapMetric, activeTab]);
+  }, [petaClusterData, petaInstitusiData, mapMetric, activeTab]);
 
   const setupLeafletMap = () => {
     const L = (window as any).L;
@@ -298,6 +419,13 @@ export default function RikubPage() {
       mapInstanceRef.current = map;
       markersLayerRef.current = markersLayer;
 
+      // Event listener ketika pengguna melakukan zoom pada peta
+      map.on("zoomend", () => {
+        const currentZoom = map.getZoom();
+        currentZoomRef.current = currentZoom;
+        updateMarkers();
+      });
+
       setTimeout(() => { map.invalidateSize(); }, 200);
     }
     updateMarkers();
@@ -308,39 +436,81 @@ export default function RikubPage() {
     if (!L || !markersLayerRef.current) return;
     markersLayerRef.current.clearLayers();
 
-    petaClusterData.forEach((item) => {
-      const displayVal = mapMetric === "judul" ? item.judul : Math.round(item.dana / 1000000000);
-      const labelText = mapMetric === "judul" ? `${item.judul}` : `${displayVal}M`;
-      let size = 40;
-      if (item.judul > 20) size = 50;
-      if (item.judul > 100) size = 62;
+    const zoom = currentZoomRef.current;
 
-      const customIcon = L.divIcon({
-        className: "custom-cluster-icon",
-        html: `
-          <div style="width: ${size}px; height: ${size}px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 800; font-size: ${size > 50 ? "13px" : "11px"}; cursor: pointer;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
-            ${labelText}
+    // JIKA ZOOM < 6: Tampilkan Klaster Provinsi
+    if (zoom < 7) {
+      petaClusterData.forEach((item) => {
+        const displayVal = mapMetric === "judul" ? item.judul : Math.round(item.dana / 1000000000);
+        const labelText = mapMetric === "judul" ? `${item.judul}` : `${displayVal}M`;
+        let size = 40;
+        if (item.judul > 20) size = 50;
+        if (item.judul > 100) size = 62;
+
+        const customIcon = L.divIcon({
+          className: "custom-cluster-icon",
+          html: `
+            <div style="width: ${size}px; height: ${size}px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 800; font-size: ${size > 50 ? "13px" : "11px"}; cursor: pointer;" title="Zoom masuk untuk melihat detail institusi">
+              ${labelText}
+            </div>
+          `,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2]
+        });
+
+        const popupContent = `
+          <div style="font-family: sans-serif; padding: 4px; min-width: 180px;">
+            <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">${item.rawName}</h4>
+            <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+              <div><b>Total Judul:</b> ${item.judul} Judul</div>
+              <div><b>Total Dana:</b> <span style="color: #059669; font-weight: 700;">Rp ${(item.dana / 1000000000).toFixed(2)} M</span></div>
+              <div><b>Institusi:</b> ${item.institusi.size} PT</div>
+              <div style="margin-top: 6px; font-style: italic; color: #6366f1; font-size: 11px;">💡 Zoom in untuk melihat detail tiap kampus</div>
+            </div>
           </div>
-        `,
-        iconSize: [size, size],
-        iconAnchor: [size / 2, size / 2]
+        `;
+
+        L.marker([item.lat, item.lng], { icon: customIcon })
+          .addTo(markersLayerRef.current)
+          .bindPopup(popupContent);
       });
+    } 
+    // JIKA ZOOM >= 6: Pecah menjadi Marker Institusi Kampus
+    else {
+      petaInstitusiData.forEach((item) => {
+        const displayVal = mapMetric === "judul" ? item.judul : Math.round(item.dana / 1000000000);
+        const labelText = mapMetric === "judul" ? `${item.judul}` : `${displayVal}M`;
+        let size = 36;
+        if (item.judul > 5) size = 44;
+        if (item.judul > 15) size = 52;
 
-      const popupContent = `
-        <div style="font-family: sans-serif; padding: 4px; min-width: 170px;">
-          <h4 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #1e293b;">${item.rawName}</h4>
-          <div style="font-size: 12px; color: #475569; line-height: 1.6;">
-            <div><b>Total Judul:</b> ${item.judul} Judul</div>
-            <div><b>Total Dana:</b> <span style="color: #059669; font-weight: 700;">Rp ${(item.dana / 1000000000).toFixed(2)} M</span></div>
-            <div><b>Institusi:</b> ${item.institusi.size} PT</div>
+        const customIcon = L.divIcon({
+          className: "custom-institution-icon",
+          html: `
+            <div style="width: ${size}px; height: ${size}px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2.5px solid #ffffff; border-radius: 50%; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 700; font-size: 11px; cursor: pointer;">
+              ${labelText}
+            </div>
+          `,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2]
+        });
+
+        const popupContent = `
+          <div style="font-family: sans-serif; padding: 4px; max-width: 240px;">
+            <h4 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #1e293b;">${item.namaInstitusi}</h4>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">📍 Provinsi: ${item.provinsi}</div>
+            <div style="font-size: 12px; color: #475569; line-height: 1.5;">
+              <div><b>Jumlah Judul:</b> ${item.judul} Riset</div>
+              <div><b>Total Dana:</b> <span style="color: #059669; font-weight: 700;">Rp ${(item.dana / 1000000000).toFixed(2)} M</span></div>
+            </div>
           </div>
-        </div>
-      `;
+        `;
 
-      L.marker([item.lat, item.lng], { icon: customIcon })
-        .addTo(markersLayerRef.current)
-        .bindPopup(popupContent);
-    });
+        L.marker([item.lat, item.lng], { icon: customIcon })
+          .addTo(markersLayerRef.current)
+          .bindPopup(popupContent);
+      });
+    }
   };
 
   return (
@@ -351,8 +521,6 @@ export default function RikubPage() {
         
         {/* ================= 1. HERO SECTION ================= */}
         <section className="flex flex-col-reverse md:flex-row gap-8 md:gap-12 items-center">
-          
-          {/* SISI KIRI: Gambar Statis Mockup (Bisa Diklik) */}
           <div className="w-full md:w-1/2 relative flex justify-center items-center">
             <div 
               className="relative w-full group cursor-pointer"
@@ -366,16 +534,12 @@ export default function RikubPage() {
             </div>
           </div>
 
-           {/* SISI KANAN: Teks Penjelasan */}
-          <div className="w-full md:w-1/2 space-y-4"> {/* Ubah space-y-6 menjadi space-y-4 agar lebih rapat */}
-            
-            {/* Header Teks & Logo (Tetap di Posisi) */}
+          <div className="w-full md:w-1/2 space-y-4">
             <div className="flex justify-between items-start w-full">
               <div className="flex items-center gap-2 pt-2">
                 <div className="w-8 h-1 bg-orange-500 rounded-full"></div>
                 <span className="text-sm font-bold text-slate-400 tracking-widest uppercase">Tentang Program</span>
               </div>
-              
               <img 
                 src="/logorikub.png" 
                 alt="Logo RIKUB" 
@@ -383,18 +547,15 @@ export default function RikubPage() {
               />
             </div>
 
-            {/* Judul & Paragraf ditarik ke atas */}
-            <div className="-mt-2 md:-mt-6"> {/* <-- TAMBAHKAN KELAS INI UNTUK MENARIK KE ATAS */}
+            <div className="-mt-2 md:-mt-6">
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
                 RIKUB <span className="block text-indigo-700">Riset Konsorsium Unggulan Berdampak</span>
               </h1>
               
               <div className="text-slate-600 space-y-4 text-lg leading-relaxed text-justify mt-6">
                 <p>Riset Konsorsium Unggulan Berdampak (RIKUB) membangun ekosistem penelitian perguruan tinggi yang produktif dengan mendorong kolaborasi antarpeneliti agar riset tidak berhenti pada skala prototipe. Pendekatan terpadu ini mengakselerasi hilirisasi inovasi dari hulu ke hilir dengan menyatukan perguruan tinggi, industri, pemerintah, dan off-taker demi mempercepat pengembangan riset nasional. Target akhirnya adalah menghasilkan produk unggulan yang memberikan dampak nyata bagi masyarakat.</p>
-                {/* <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> */}
               </div>
             </div>
-
           </div>
         </section>
 
@@ -500,7 +661,6 @@ export default function RikubPage() {
               {/* ================= TAB SEBARAN ================= */}
               {activeTab === "sebaran" && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
-                  {/* CHART 1: Fokus Riset */}
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <div className="flex flex-col mb-4">
                       <div className="flex items-center gap-2 mb-3">
@@ -533,7 +693,6 @@ export default function RikubPage() {
                     </div>
                   </div>
 
-                  {/* CHART 2: Status Institusi (Donut) */}
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
                     <div className="flex items-center gap-2 mb-6">
                       <div className="w-2 h-6 bg-emerald-500 rounded-full"></div>
@@ -567,7 +726,6 @@ export default function RikubPage() {
                     </div>
                   </div>
 
-                  {/* CHART 3: Top 5 Provinsi */}
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <div className="flex flex-col mb-4">
                       <div className="flex items-center gap-2 mb-3">
@@ -604,7 +762,6 @@ export default function RikubPage() {
                       })}
                     </div>
                   </div>
-
                 </div>
               )}
 
@@ -630,9 +787,7 @@ export default function RikubPage() {
                       <tbody className="divide-y divide-slate-100 bg-white">
                         {top10Riset.map((row, idx) => (
                           <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-4 py-4 text-center font-bold text-slate-500">
-                              {idx + 1}
-                            </td>
+                            <td className="px-4 py-4 text-center font-bold text-slate-500">{idx + 1}</td>
                             <td className="px-4 py-4 font-bold text-slate-800">{row.nama}</td>
                             <td className="px-4 py-4 text-slate-600">{row.nama_institusi_ketua_konsorsium}</td>
                             <td className="px-4 py-4 text-slate-500">
@@ -657,7 +812,6 @@ export default function RikubPage() {
               {/* ================= TAB PETA WILAYAH ================= */}
               {activeTab === "peta" && (
                 <div className="space-y-6 animate-in fade-in duration-300">
-                  
                   <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm relative space-y-4">
                     
                     {/* Header Controls */}
@@ -694,6 +848,9 @@ export default function RikubPage() {
                     {/* Leaflet Map Container */}
                     <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
                       <div id="leaflet-map-container" className="w-full h-full z-10"></div>
+                      <div className="absolute bottom-3 left-3 z-[400] bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm text-xs font-semibold text-slate-600">
+                        💡 Tips: Zoom in (perbesar peta) untuk melihat detail titik per kampus/institusi.
+                      </div>
                     </div>
 
                     {/* Footer Summary Cards */}
@@ -729,9 +886,16 @@ export default function RikubPage() {
                       </div>
 
                       <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md border border-slate-800 flex justify-between items-center">
-                        <div>
-                          <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider mb-1">Bidang Fokus</span>
-                          <span className="text-2xl font-black text-white">{uniqueBidang.length}</span>
+                        <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md border border-slate-800 flex justify-between items-center">
+                          <div>
+                            <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider mb-1">Bidang Fokus</span>
+                            <span className="text-2xl font-black text-white">{filteredUniqueBidangCount}</span>
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                          </div>
                         </div>
                         <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
@@ -740,7 +904,6 @@ export default function RikubPage() {
                     </div>
 
                   </div>
-
                 </div>
               )}
 
@@ -750,7 +913,6 @@ export default function RikubPage() {
 
       </main>
        
-       {/* Tambahkan Footer di sini */}
       <PublicFooter />
 
       {/* ================= MODAL PDF PANDUAN ================= */}
@@ -758,7 +920,6 @@ export default function RikubPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all animate-in fade-in duration-300">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
             
-            {/* Header Modal */}
             <div className="flex justify-between items-center p-4 border-b border-slate-200 bg-slate-50">
               <h3 className="font-bold text-slate-800 text-lg">Panduan RIKUB 2026</h3>
               <button 
@@ -769,7 +930,6 @@ export default function RikubPage() {
               </button>
             </div>
 
-            {/* Area PDF (Google Drive Preview) */}
             <div className="flex-1 bg-slate-100 relative">
               <iframe 
                 src="https://drive.google.com/file/d/1xNcHh3A2pD3ZBCUcvia0UvxDcw_t7bG2/preview" 
@@ -779,7 +939,6 @@ export default function RikubPage() {
               />
             </div>
 
-            {/* Footer Modal (Tombol Buka di Tab Baru) */}
             <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
               <a 
                 href="https://drive.google.com/file/d/1xNcHh3A2pD3ZBCUcvia0UvxDcw_t7bG2/view?usp=sharing" 
