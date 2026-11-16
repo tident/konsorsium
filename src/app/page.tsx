@@ -126,8 +126,9 @@ export default function LandingPage() {
           
           {/* Kartu 2025 - Penerima */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px]">
-            <div className="inline-block bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4">
-              TA 2025
+            <div className="flex items-center gap-2 mb-6">
+              <span className="bg-indigo-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">RIKUB</span>
+              <span className="bg-indigo-50 text-indigo-900 text-xs font-medium px-3 py-1 rounded-full">TA 2025</span>
             </div>
             <div>
               <h3 className="text-4xl font-black text-indigo-950 mb-1">82</h3>
@@ -137,8 +138,9 @@ export default function LandingPage() {
 
           {/* Kartu 2025 - Anggaran */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px]">
-            <div className="inline-block bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4">
-              TA 2025
+            <div className="flex items-center gap-2 mb-6">
+              <span className="bg-indigo-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">RIKUB</span>
+              <span className="bg-indigo-50 text-indigo-900 text-xs font-medium px-3 py-1 rounded-full">TA 2025</span>
             </div>
             <div>
               <h3 className="text-4xl font-black text-indigo-950 mb-1">Rp45,41 M</h3>
@@ -152,7 +154,7 @@ export default function LandingPage() {
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
             
             <div className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4 relative z-10">
-              TA 2026
+              RIKUB TA 2026
             </div>
             <div className="relative z-10">
               <h3 className="text-4xl font-black text-white mb-1">102</h3>
@@ -165,8 +167,9 @@ export default function LandingPage() {
              {/* Dekorasi Background */}
              <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
             
+            
             <div className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg w-fit mb-4 relative z-10">
-              TA 2026
+              RIKUB TA 2026
             </div>
             <div className="relative z-10">
               <h3 className="text-4xl font-black text-white mb-1">Rp62,49 M</h3>

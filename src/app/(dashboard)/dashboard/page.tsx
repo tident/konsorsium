@@ -134,7 +134,7 @@ export default function DashboardHomePage() {
                           {item.date}
                         </span>
                         <h3 className="text-xl font-bold mb-2 leading-tight">{item.title}</h3>
-                        <p className="text-indigo-100 text-sm mb-5 leading-relaxed max-w-lg line-clamp-3">{item.desc}</p>
+                        <p className="text-indigo-100 text-sm mb-5 leading-relaxed max-w-lg line-clamp-3 whitespace-pre-line">{item.desc}</p>
                         {item.link && (
                           <Link href={item.link} className="inline-block bg-white text-indigo-900 hover:bg-indigo-50 px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer">
                             Selengkapnya
@@ -190,7 +190,7 @@ export default function DashboardHomePage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-800">{panduanData.title}</h3>
-                  <p className="text-xs text-slate-500 mb-1">{panduanData.desc}</p>
+                  <p className="text-xs text-slate-500 mb-1 whitespace-pre-line">{panduanData.desc}</p>
                   {panduanData.link && (
                     <Link href={panduanData.link} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
                       Buka Panduan
@@ -226,7 +226,7 @@ export default function DashboardHomePage() {
                           <span className="text-[11px] text-slate-400">{update.date}</span>
                         </div>
                         <h4 className="text-xs font-bold text-slate-800 leading-tight mb-0.5">{update.title}</h4>
-                        <p className="text-[11px] text-slate-500 leading-normal">{update.desc}</p>
+                        <p className="text-[11px] text-slate-500 leading-normal whitespace-pre-line">{update.desc}</p>
                       </div>
                     </div>
                   ))}
