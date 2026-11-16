@@ -224,7 +224,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
         {/* Area Footer */}
         <div className={`p-2 border-t border-slate-100 transition-all duration-300 ${isOpen ? "" : "flex justify-center"}`}>
           <div className={`bg-slate-50 rounded-xl text-center overflow-hidden ${isOpen ? "p-2 w-full" : "p-2 w-10 h-10 flex items-center justify-center"}`}>
-             <p className={`text-xs text-slate-500 whitespace-nowrap ${isOpen ? "block" : "hidden"}`}>Versi 8.0.0</p>
+             <p className={`text-xs text-slate-500 whitespace-nowrap ${isOpen ? "block" : "hidden"}`}>Versi 8.1.0</p>
              {!isOpen && <span className="text-slate-400 font-bold text-xs">v5</span>}
           </div>
         </div>
